@@ -1,11 +1,14 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, DollarSign, Users, Sparkles } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card";
+import { ArrowLeft, Calendar, DollarSign, Users, Sparkles, Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GlowCard } from "@/components/GlowCard";
 import { GradientBorderButton } from "@/components/GradientBorderButton";
@@ -109,6 +112,12 @@ export default function ProjectDetail() {
   }
   
 
+  
+interface Message {
+  sender: "user" | "bot";
+  text: string;
+}
+
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [documents, setDocuments] = useState<DocumentChunk[]>([]);
@@ -116,6 +125,19 @@ export default function ProjectDetail() {
   const [analysis, setAnalysis] = useState("");
   const [reports, setReports] = useState("");
   const [loadingAnalysis, setLoadingAnalysis] = useState(true);
+  const [messages, setMessages] = useState<Message[]>([]);
+    const [input, setInput] = useState("");
+    const [chatbotLoading, setChatbotLoading] = useState(false);
+    const messagesEndRef = useRef<null | HTMLDivElement>(null)
+  interface Stakeholder {
+    id: string;
+    stakeholder_name: string;
+  }
+  
+  const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
+  const [selectedStakeholder, setSelectedStakeholder] = useState("");
+  const [stakeholderType, setStakeholderType] = useState("");
+
 
   useEffect(() => {
     async function fetchProjectData() {
@@ -153,7 +175,107 @@ export default function ProjectDetail() {
     if (params.id) {
       fetchProjectData();
     }
+
+    
   }, [params.id]);
+
+  useEffect(() => {
+    async function fetchStakeholders() {
+      try {
+        const res = await fetch("/api/routes");
+        const data = await res.json();
+        setStakeholders(data);
+      } catch (error) {
+        console.error("Error fetching stakeholders:", error);
+      }
+    }
+    fetchStakeholders();
+  }, []);
+
+  async function handleAddStakeholder() {
+    if (!selectedStakeholder || !stakeholderType) {
+      alert("Please select a stakeholder and type.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/routes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          stakeholder_id: selectedStakeholder,
+          project_id: params.id,
+          stakeholder_type: stakeholderType,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Stakeholder added successfully!");
+        setSelectedStakeholder("");
+        setStakeholderType("");
+      } else {
+        console.error("Error adding stakeholder:", await response.json());
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+   useEffect(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+  
+    const sendMessage = async () => {
+      if (!input.trim()) return;
+    
+      const userMessage: Message = { sender: "user", text: input };
+      setMessages((prev) => [...prev, userMessage]);
+      setInput("");
+      setChatbotLoading(true);
+    
+      try {
+        const response = await fetch("/api/chatbot", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question: input, // ✅ Ensure API receives `question`
+            context: {
+              overview,
+              analysis,
+              reports,
+              documents: documents.map((doc) => ({ content: doc.content })), // ✅ Ensure documents are formatted correctly
+            },
+          }),
+        });
+    
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to get response from AI");
+        }
+    
+        const data = await response.json();
+        const botMessage: Message = { sender: "bot", text: cleanResponse(data.answer) };
+    
+        setMessages((prev) => [...prev, botMessage]);
+      } catch (error) {
+        console.error("Chatbot error:", error);
+        setMessages((prev) => [
+          ...prev,
+          { sender: "bot", text: "❌ Error: Unable to process your request." },
+        ]);
+      } finally {
+        setChatbotLoading(false);
+      }
+    };
+    
+  
+    const cleanResponse = (response: string) => {
+      return response.replace(/[*_-]/g, "").trim();
+    };
 
   if (loading) {
     return <div className="text-center text-white text-lg">Loading...</div>;
@@ -163,8 +285,7 @@ export default function ProjectDetail() {
     return <div className="text-center text-red-500 text-lg">Project not found.</div>;
   }
 
-
-
+  
   return (
     <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
@@ -515,19 +636,48 @@ export default function ProjectDetail() {
               />
              </TabsContent>
              <TabsContent value="stakeholders">
-               <Card>
-                 <CardHeader>
-                   <CardTitle>Stakeholder Management</CardTitle>
-                   <CardDescription>Manage and engage with project stakeholders</CardDescription>
-                 </CardHeader>
-                 <CardContent>
-                   <p>Stakeholder information and engagement tools will be displayed here.</p>
-                   <GradientBorderButton className="mt-4">Add Stakeholder</GradientBorderButton>
-                 </CardContent>
-               </Card>
+             <Card>
+    <CardHeader>
+      <CardTitle>Stakeholder Management</CardTitle>
+      <CardDescription>Manage and engage with project stakeholders</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <div className="space-y-4">
+        <Select onValueChange={setSelectedStakeholder}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a stakeholder" />
+          </SelectTrigger>
+          <SelectContent>
+            {stakeholders.map((stakeholder) => (
+              <SelectItem key={stakeholder.id} value={stakeholder.id}>
+                {stakeholder.stakeholder_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select onValueChange={setStakeholderType}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select stakeholder type" />
+          </SelectTrigger>
+          <SelectContent>
+            {["Investor", "Employee", "General Public"].map((type) => (
+              <SelectItem key={type} value={type}>
+                {type}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <GradientBorderButton className="mt-4" onClick={handleAddStakeholder}>
+          Add Stakeholder
+        </GradientBorderButton>
+      </div>
+    </CardContent>
+  </Card>
              </TabsContent>
             <TabsContent value="chatbot">
-            <Card>
+            {/* <Card>
                  <CardHeader>
                    <CardTitle>Chatbot</CardTitle>
                    <CardDescription>Manage and engage with project stakeholders</CardDescription>
@@ -536,7 +686,62 @@ export default function ProjectDetail() {
                    <p>Stakeholder information and engagement tools will be displayed here.</p>
                    <GradientBorderButton className="mt-4">Add Stakeholder</GradientBorderButton>
                  </CardContent>
-               </Card>
+               </Card> */}
+               <Card>
+                <CardHeader>
+                  <CardTitle>Chatbot</CardTitle>
+                  <CardDescription>Ask questions and get AI-powered insights about this project.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="w-full">
+                    <div className="flex flex-col space-y-4">
+                      {messages.length === 0 ? (
+                        <p className="text-gray-400 text-center">👋 Start a conversation with the AI!</p>
+                      ) : (
+                        messages.map((msg, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: index * 0.05 }}
+                            className={`max-w-[75%] p-3 rounded-xl shadow-md ${
+                              msg.sender === "user"
+                                ? "bg-green-500 text-white ml-auto"
+                                : "bg-gray-800 text-gray-100"
+                            }`}
+                          >
+                            {msg.text}
+                          </motion.div>
+                        ))
+                      )}
+                      {chatbotLoading && (
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <Loader2 className="animate-spin" size={18} /> Thinking...
+                        </div>
+                      )}
+                      <div ref={messagesEndRef}></div>
+                    </div>
+
+                    {/* Input Section */}
+                    <div className="flex items-center gap-2 pt-4">
+                      <Input
+                        className="flex-1 text-white bg-gray-800 border-gray-600"
+                        placeholder="Type your message..."
+                        value={input}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === "Enter" && sendMessage()}
+                      />
+                      <Button
+                        className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-all"
+                        onClick={sendMessage}
+                        disabled={chatbotLoading}
+                      >
+                        ➤
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </motion.div>

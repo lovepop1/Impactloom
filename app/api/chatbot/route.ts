@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// Initialize Gemini AI with the API key
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,25 +34,16 @@ export async function POST(req: NextRequest) {
     `;
 
     // Call Google Gemini API
-    const response = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-      }),
-    });
+    const response = await model.generateContent(prompt);
+    const data = await response.response;
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return NextResponse.json({ error: data.error.message || "Failed to fetch response" }, { status: response.status });
+    if (!data.candidates || data.candidates.length === 0) {
+      return NextResponse.json({ error: "No response from Gemini AI." }, { status: 500 });
     }
 
-    return NextResponse.json({ answer: data.candidates[0]?.content?.parts[0]?.text || "No response from Gemini AI." });
+    return NextResponse.json({ answer: data.candidates[0]?.content?.parts[0]?.text || "No valid response." });
   } catch (error) {
+    console.error("Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

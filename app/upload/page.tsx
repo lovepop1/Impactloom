@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileUploader } from "@/components/FileUploader"
 import { toast } from "@/components/ui/use-toast"
+import { Checkbox } from "@/components/ui/checkbox"
 import { PDFDocument } from "pdf-lib";
 import { ArrowLeft } from "lucide-react"
 import * as pdfjsLib from "pdfjs-dist";
@@ -33,6 +34,7 @@ import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 // GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js"; // Will be served locally
 
 // GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@2.10.377/build/pdf.worker.min.js";
+
 
 
 
@@ -106,8 +108,28 @@ export default function UploadPage() {
       end_date: "",
     },
   })
+    interface CheckedItems {
+      ISO26000: boolean;
+      GRI: boolean;
+      SASB: boolean;
+      TCFD: boolean;
+      SDG: boolean;
+    }
 
+    const [checkedItems, setCheckedItems] = useState<CheckedItems>({
+      ISO26000: false,
+      GRI: false,
+      SASB: false,
+      TCFD: false,
+      SDG: false,
+    });
 
+    const toggleCheckbox = (key: keyof CheckedItems) => {
+      setCheckedItems((prev: CheckedItems) => ({
+        ...prev,
+        [key]: !prev[key],
+      }));
+    };
   // async function parsePDF(file: File): Promise<string> {
   //   return new Promise((resolve, reject) => {
   //     const reader = new FileReader();
@@ -359,6 +381,46 @@ export default function UploadPage() {
                   </FormItem>
                 )}
               />
+              <div>
+      <FormLabel>Compliance & Standards</FormLabel>
+      <div className="flex flex-col space-y-2">
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            checked={checkedItems.ISO26000} 
+            onClick={() => toggleCheckbox("ISO26000")} 
+          />
+          <FormLabel>ISO 26000</FormLabel>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            checked={checkedItems.GRI} 
+            onClick={() => toggleCheckbox("GRI")} 
+          />
+          <FormLabel>GRI</FormLabel>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            checked={checkedItems.SASB} 
+            onClick={() => toggleCheckbox("SASB")} 
+          />
+          <FormLabel>SASB</FormLabel>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            checked={checkedItems.TCFD} 
+            onClick={() => toggleCheckbox("TCFD")} 
+          />
+          <FormLabel>TCFD</FormLabel>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            checked={checkedItems.SDG} 
+            onClick={() => toggleCheckbox("SDG")} 
+          />
+          <FormLabel>SDG</FormLabel>
+        </div>
+      </div>
+    </div>
               <FormField
                 name="files"
                 render={() => (
