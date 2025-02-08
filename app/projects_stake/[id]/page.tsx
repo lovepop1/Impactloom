@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GlowCard } from "@/components/GlowCard"
 import { GradientBorderButton } from "@/components/GradientBorderButton"
 import { Progress } from "@/components/ui/progress"
+import ReportsTabContent from "@/components/ReportsTabContent";
 
 // Mock data for a project
 const projectData = {
@@ -174,7 +175,7 @@ Targeted Outcome: To enhance India's literacy rate
               </Card>
             </TabsContent>
             <TabsContent value="reports">
-              <Card>
+              {/* <Card>
                 <CardHeader>
                   <CardTitle>Project Reports</CardTitle>
                   <CardDescription>Access and generate reports for this project</CardDescription>
@@ -182,7 +183,8 @@ Targeted Outcome: To enhance India's literacy rate
                 <CardContent>
                   <p>Project reports and report generation tools will be listed here.</p>
                 </CardContent>
-              </Card>
+              </Card> */}
+              <ReportsTabContent project={project} />
             </TabsContent>
             <TabsContent value="review">
   <Card>

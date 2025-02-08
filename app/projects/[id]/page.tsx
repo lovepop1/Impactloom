@@ -12,7 +12,9 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GlowCard } from "@/components/GlowCard";
 import { GradientBorderButton } from "@/components/GradientBorderButton";
-import { fetchGeminiAnalysis } from "@/app/lib/gemini"; 
+import { fetchGeminiAnalysis } from "@/app/lib/gemini";
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
+import ReportsTabContent from "@/components/ReportsTabContent";
 
 
 import DonutChart from "@/components/Charts/DonutChart";
@@ -225,6 +227,8 @@ interface Message {
     }
   }
 
+  
+
    useEffect(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
@@ -271,6 +275,21 @@ interface Message {
         setChatbotLoading(false);
       }
     };
+
+
+    const reviewsData = [
+      { name: "Positive", value: 70 },
+      { name: "Neutral", value: 20 },
+      { name: "Negative", value: 10 },
+    ];
+  
+    const COLORS = ["#00C49F", "#FFBB28", "#FF4D4D"];
+  
+    const sentimentData = [
+      { name: "Total Reviews", reviews: 100 },
+      { name: "Positive Reviews", reviews: 70 },
+      { name: "Negative Reviews", reviews: 10 },
+    ];
     
   
     const cleanResponse = (response: string) => {
@@ -629,14 +648,15 @@ interface Message {
                  <p>{reports}</p>
                  </CardContent>
              </Card> */}
-             <ContentCard
+             {/* <ContentCard
                 title="Project Report"
                 description=""
                 content={reports}
-              />
+              /> */}
+              <ReportsTabContent project={project} />
              </TabsContent>
              <TabsContent value="stakeholders">
-             <Card>
+             {/* <Card>
     <CardHeader>
       <CardTitle>Stakeholder Management</CardTitle>
       <CardDescription>Manage and engage with project stakeholders</CardDescription>
@@ -674,7 +694,85 @@ interface Message {
         </GradientBorderButton>
       </div>
     </CardContent>
-  </Card>
+  </Card> */}
+  <div className="space-y-6">
+  <Card>
+      <CardHeader>
+        <CardTitle>Stakeholder Management</CardTitle>
+        <CardDescription>Manage and engage with project stakeholders</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <Select onValueChange={setSelectedStakeholder}>
+            <SelectTrigger>
+              <SelectValue placeholder="Adithya Nangarath" />
+            </SelectTrigger>
+            <SelectContent>
+              {stakeholders.map((stakeholder) => (
+                <SelectItem key={stakeholder.id} value={stakeholder.stakeholder_name}>
+                  {stakeholder.stakeholder_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select onValueChange={setStakeholderType}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select stakeholder type" />
+            </SelectTrigger>
+            <SelectContent>
+              {["Investor", "Employee", "General Public"].map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <GradientBorderButton className="mt-4" onClick={handleAddStakeholder}>
+            Add Stakeholder
+          </GradientBorderButton>
+        </div>
+      </CardContent>
+    </Card>
+    <Card>
+        <CardHeader>
+          <CardTitle>Stakeholder Review</CardTitle>
+          <CardDescription>Insights from stakeholder feedback</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Sentiment Pie Chart */}
+            <div className="flex flex-col items-center">
+              <h3 className="text-lg font-semibold">Sentiment Analysis</h3>
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie data={reviewsData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70}>
+                    {reviewsData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Reviews Bar Chart */}
+            <div className="flex flex-col items-center">
+              <h3 className="text-lg font-semibold">Review Breakdown</h3>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={sentimentData}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="reviews" fill="#3498db" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      </div>
              </TabsContent>
             <TabsContent value="chatbot">
             {/* <Card>
