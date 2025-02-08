@@ -1,0 +1,23 @@
+[
+  {
+    "companyName": "GreenTech Solutions",
+    "matchScore": 0.89,
+    "description": "GreenTech Solutions is a leader in sustainable agriculture technologies, developing innovative solutions to improve food security and reduce environmental impact.",
+    "alignment": "Their focus on sustainable agriculture aligns strongly with your company's CSR goals of ending hunger and promoting sustainable development.",
+    "trackRecord": "They have partnered with farmers to implement water-efficient irrigation systems and reduce pesticide use, contributing to improved food yields and environmental conservation."
+  },
+  {
+    "companyName": "Global Food Bank Network",
+    "matchScore": 0.82,
+    "description": "The Global Food Bank Network is a non-profit organization dedicated to alleviating hunger through a global network of food banks.",
+    "alignment": "Your company's financial resources can directly support their mission of addressing food insecurity, aligning with your CSR goal of ending hunger.",
+    "trackRecord": "They have provided over 2 billion meals to vulnerable communities worldwide, significantly reducing food waste and supporting food security initiatives."
+  },
+  {
+    "companyName": "The Ocean Cleanup",
+    "matchScore": 0.76,
+    "description": "The Ocean Cleanup is a non-profit organization focused on developing and deploying technologies to remove plastic pollution from the oceans.",
+    "alignment": "Their work on ocean conservation aligns with your company's commitment to sustainable development and environmental protection.",
+    "trackRecord": "They have successfully developed and deployed advanced technology to clean up large plastic accumulations in the Great Pacific Garbage Patch."
+  }
+]
