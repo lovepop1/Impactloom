@@ -31,7 +31,7 @@ export default function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <GradientBorderButton>
-              <Link href="/projects" className="text-primary text-white">
+              <Link href="/projects_stake" className="text-primary text-white">
                 Projects
               </Link>
             </GradientBorderButton>

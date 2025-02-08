@@ -1,0 +1,23 @@
+[
+  {
+    "companyName": "HealthAid",
+    "matchScore": 0.88,
+    "description": "HealthAid is a non-profit organization dedicated to providing access to quality healthcare services in underserved rural communities.",
+    "alignment": "Their mission directly aligns with your CSR goal of improving healthcare for rural people.",
+    "trackRecord": "They have established mobile clinics and trained local healthcare professionals in over 20 rural areas, impacting thousands of lives."
+  },
+  {
+    "companyName": "RuralHealthTech",
+    "matchScore": 0.82,
+    "description": "RuralHealthTech develops innovative technology solutions for remote healthcare delivery, focusing on telemedicine and digital diagnostics.",
+    "alignment": "Their technology can help bridge the gap in healthcare access for rural populations, complementing your funding resources.",
+    "trackRecord": "They have partnered with hospitals to provide virtual consultations and remote patient monitoring in remote areas, increasing accessibility and improving healthcare outcomes."
+  },
+  {
+    "companyName": "MedAccess",
+    "matchScore": 0.75,
+    "description": "MedAccess is a social enterprise dedicated to making essential medicines and medical supplies affordable and accessible in rural regions.",
+    "alignment": "Their focus on affordable healthcare solutions for rural communities aligns with your CSR goals and financial resources.",
+    "trackRecord": "They have successfully negotiated lower prices for critical medications and medical equipment, improving access to essential healthcare in rural settings."
+  }
+]
