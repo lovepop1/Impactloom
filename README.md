@@ -3,7 +3,7 @@
 ## Overview
 The Impactloom is a Next.js application designed to assess and visualize the effectiveness of Corporate Social Responsibility (CSR) projects. It integrates with Supabase for data storage and Prisma for database management while leveraging Google's Gemini AI for generating insights and reports.
 
-## Try it out
+## Demo
 https://youtu.be/sja_xiI25jo?si=edgIi5UYbMexgMQm
 
 ## Prerequisites
