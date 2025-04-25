@@ -16,12 +16,13 @@ Before you begin, ensure you have the following installed:
 ## Installation
 
 ### 1. Install Dependencies
-```sh
+
 yarn install
 # or
 npm install
 
 ### 2. Setup Environment Variables
+
 """
 Create a .env file and a .env.local file in the root directory and add the following environment variables:
 DATABASE_URL=your_supabase_postgres_database_url
